@@ -204,7 +204,7 @@ public class Main extends Application{
 	private Object mqttPublish(String nodeId) {
 		
 		
-		
+		System.out.println("[Main.mqttPublish] node " + nodeId + " clicked.");
 		switch(nodeId)
 		{
 		
