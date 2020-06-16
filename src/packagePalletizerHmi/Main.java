@@ -3,6 +3,8 @@ package packagePalletizerHmi;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import javafx.application.Application;
@@ -23,6 +25,47 @@ public class Main extends Application{
 	static MqttFx mqttClient ;
 	TextArea console;
 	byte[] mqttPayload = new byte[34];
+	
+	//Actuator type
+	final int 	NO_ACTUATOR = 0,
+				PALLETIZER_BELT = 1,
+				PALLETIZER_CHAIN = 2,
+				BELT_CONVEYOR = 3,
+				ROLLER_CONVEYOR_1 = 4,
+				ROLLER_CONVEYOR_2 = 5,
+				TURN_CYLINDER = 6,
+				CLAMPER_CYLINDER = 7,
+				PUSHER_CYLINDER = 8,
+				PLATE_CYLINDER = 9,
+				ELEVATOR = 10;
+	
+	//Actuator cmd type
+	final int 	NO_CMD = 0,
+				FORWARD = 1,
+				BACKWARD = 2,
+				VELOCITY = 3,
+				PUSH = 4,
+				RETRACT = 5,
+				UP = 6,
+				DOWN = 7,
+				UP_TO_LIMIT = 8,
+				DOWN_TO_LIMIT = 9,
+				START = 10,
+				STOP = 11,
+				HOME = 12,
+				RESET = 13;
+
+	//Mode type
+	final int 	NO_MODE_TYPE = 0,
+				AUTOMATIC_MODE_TYPE = 1,
+				MANUAL_MODE_TYPE = 2,
+				SYSTEM_MODE_TYPE = 3;
+	
+	//Payload byte section
+	final int 	MODE = 2,
+				ACTUATOR = 3,
+				CMD = 4;
+	
 	
 	public static void main(String[] args) {
 		launch();
@@ -72,73 +115,144 @@ public class Main extends Application{
 			if(node.getId() == null)
 				continue;
 			
+			System.out.println("[Main.start] node " + node.getId() + " found.");
 			switch(node.getId())
 			{
 			
 			case "beltPlusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("beltPlusId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "beltMinusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("beltMinusId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "turnId":
+			case "beltStopId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("turnId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
+				
+			case "turnerPlusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "turnerMinusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
 				
 			case "chainPlusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("chainPlusId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "clampId":
+			case "chainMinusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("clampId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "pushId":
+			case "chainStopId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("pushId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
+				
+			case "clamperPlusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
+				
+			case "clamperMinusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
+				
+			case "pusherPlusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "pusherMinusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;		
 				
 			case "openPlateId":
 								
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("openPlateId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "closePlateId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "elevatorPlusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("elevatorPlusId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "elevatorMinusId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("elevatorMinusId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "moveToLimitId":
+			case "moveToMaxLimitId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("moveToLimitId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "beltConveyorId":
+			case "moveToMinLimitId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("beltConveyorId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
-			case "rollerConveyor1Id":
+			case "beltConvPlusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "beltConvMinusId":
+					
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "beltConvStopId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;
+				
+			case "rollerConveyor1PlusId":
 							
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("rollerConveyor1Id"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
-							
-			case "rollerConveyor2Id":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("rollerConveyor2Id"));
+			case "rollerConveyor1MinusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
+				
+			case "rollerConveyor1StopId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
+				
+			case "rollerConveyor2PlusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
+				
+			case "rollerConveyor2MinusId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
+				
+			case "rollerConveyor2StopId":
+				
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
+				break;	
 				
 			case "consoleId":
 				
@@ -147,39 +261,38 @@ public class Main extends Application{
 				
 			case "manualId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("manualId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "automaticId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("automaticId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "startId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("startId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "stopId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("stopId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "homeId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("homeId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
 				
 			case "resetId":
 				
-				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish("resetId"));
+				node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish(node.getId()));
 				break;
-	
 				
 			}
 		}
 		
-		mqttClient = new MqttFx("tcp://localhost:1883", new MqttFxCallback(console) ) ;
+		mqttClient = new MqttFx("tcp://localhost:1883", new MqttFxCallback(console), console ) ;
 		mqttClient.subscribe("PalletizerHmiMessages"); 
 		Scene scene = new Scene(root);
 		stage.setScene(scene);		
@@ -190,17 +303,7 @@ public class Main extends Application{
 		
 	}
 
-	/*
-	 * 	TYPE ST_MqttPayload :
-		STRUCT
-			id : UINT;
-			data : ARRAY[1..32] OF Byte;
-		END_STRUCT
-		END_TYPE
 
-	 * 
-	 * 
-	 * */
 	private Object mqttPublish(String nodeId) {
 		
 		
@@ -211,8 +314,21 @@ public class Main extends Application{
 		case "beltPlusId":
 			
 			
-			mqttPayload[4] = 1;
-			mqttPayload[5] = 1;
+			mqttPayload[ACTUATOR] = PALLETIZER_BELT;
+			mqttPayload[CMD] = FORWARD;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "beltStopId":
+	
+			mqttPayload[ACTUATOR] = PALLETIZER_BELT;
+			mqttPayload[CMD] = STOP;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -224,8 +340,8 @@ public class Main extends Application{
 			
 		case "beltMinusId":
 			
-			mqttPayload[4] = 1;
-			mqttPayload[5] = 2;
+			mqttPayload[ACTUATOR] = PALLETIZER_BELT;
+			mqttPayload[CMD] = BACKWARD;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -235,10 +351,23 @@ public class Main extends Application{
 			}
 			break;
 			
-		case "turnId":
+		case "turnerPlusId":
 			
-			mqttPayload[4] = 5;
-			mqttPayload[5] = 4;
+			mqttPayload[ACTUATOR] = TURN_CYLINDER;
+			mqttPayload[CMD] = PUSH;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "turnerMinusId":
+			
+			mqttPayload[ACTUATOR] = TURN_CYLINDER;
+			mqttPayload[CMD] = RETRACT;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -250,8 +379,8 @@ public class Main extends Application{
 			
 		case "chainPlusId":
 			
-			mqttPayload[4] = 2;
-			mqttPayload[5] = 1;
+			mqttPayload[ACTUATOR] = PALLETIZER_CHAIN;
+			mqttPayload[CMD] = FORWARD;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -261,10 +390,10 @@ public class Main extends Application{
 			}
 			break;
 			
-		case "clampId":
+		case "chainStopId":
 			
-			mqttPayload[4] = 6;
-			mqttPayload[5] = 4;
+			mqttPayload[ACTUATOR] = PALLETIZER_CHAIN;
+			mqttPayload[CMD] = STOP;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -274,10 +403,62 @@ public class Main extends Application{
 			}
 			break;
 			
-		case "pushId":
+		case "chainMinusId":
 			
-			mqttPayload[4] = 7;
-			mqttPayload[5] = 4;
+			mqttPayload[ACTUATOR] = PALLETIZER_CHAIN;
+			mqttPayload[CMD] = BACKWARD;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;	
+			
+		case "clamperPlusId":
+			
+			mqttPayload[ACTUATOR] = CLAMPER_CYLINDER;
+			mqttPayload[CMD] = PUSH;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "clamperMinusId":
+			
+			mqttPayload[ACTUATOR] = CLAMPER_CYLINDER;
+			mqttPayload[CMD] = RETRACT;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "pusherPlusId":
+			
+			mqttPayload[ACTUATOR] = PUSHER_CYLINDER;
+			mqttPayload[CMD] = PUSH;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "pusherMinusId":
+			
+			mqttPayload[ACTUATOR] = PUSHER_CYLINDER;
+			mqttPayload[CMD] = RETRACT;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -289,8 +470,21 @@ public class Main extends Application{
 			
 		case "openPlateId":
 							
-			mqttPayload[4] = 8;
-			mqttPayload[5] = 4;
+			mqttPayload[ACTUATOR] = PLATE_CYLINDER;
+			mqttPayload[CMD] = PUSH;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "closePlateId":
+			
+			mqttPayload[ACTUATOR] = PLATE_CYLINDER;
+			mqttPayload[CMD] = RETRACT;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -302,8 +496,8 @@ public class Main extends Application{
 			
 		case "elevatorPlusId":
 			
-			mqttPayload[4] = 9;
-			mqttPayload[5] = 6;
+			mqttPayload[ACTUATOR] = ELEVATOR;
+			mqttPayload[CMD] = UP;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -316,8 +510,8 @@ public class Main extends Application{
 			
 		case "elevatorMinusId":
 			
-			mqttPayload[4] = 9;
-			mqttPayload[5] = 7;
+			mqttPayload[ACTUATOR] = ELEVATOR;
+			mqttPayload[CMD] = DOWN;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -328,24 +522,10 @@ public class Main extends Application{
 			
 			break;
 			
-		case "moveToLimitId":
+		case "moveToMaxLimitId":
 			
-			mqttPayload[4] = 9;
-			mqttPayload[5] = 8;
-			
-			try {
-				mqttClient.publish("PalHmi", mqttPayload);
-			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			break;
-			
-		case "beltConveyorId":
-			
-			mqttPayload[4] = 3;
-			mqttPayload[5] = 1;
+			mqttPayload[ACTUATOR] = ELEVATOR;
+			mqttPayload[CMD] = UP_TO_LIMIT;
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -356,10 +536,67 @@ public class Main extends Application{
 			
 			break;
 			
-		case "rollerConveyor1Id":
+		case "moveToMinLimitId":
+			
+			mqttPayload[ACTUATOR] = ELEVATOR;
+			mqttPayload[CMD] = DOWN_TO_LIMIT;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			break;
+			
+		case "beltConvPlusId":
+			
+			mqttPayload[ACTUATOR] = BELT_CONVEYOR;
+			mqttPayload[CMD] = FORWARD;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			break;
+			
+		case "beltConvMinusId":
+			
+			mqttPayload[ACTUATOR] = BELT_CONVEYOR;
+			mqttPayload[CMD] = BACKWARD;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			break;
+			
+		case "beltConvStopId":
+			
+			mqttPayload[ACTUATOR] = BELT_CONVEYOR;
+			mqttPayload[CMD] = STOP;
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			break;
+			
+		case "rollerConveyor1PlusId":
 						
-			mqttPayload[4] = 4;
-			mqttPayload[5] = 1;
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_1;
+			mqttPayload[CMD] = FORWARD;
+			
 			
 			try {
 				mqttClient.publish("PalHmi", mqttPayload);
@@ -368,22 +605,86 @@ public class Main extends Application{
 				e.printStackTrace();
 			}
 			break;
-						
-		case "rollerConveyor2Id":
+			
+		case "rollerConveyor1StopId":
+			
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_1;
+			mqttPayload[CMD] = STOP;
 			
 			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 			
+		case "rollerConveyor1MinusId":
+			
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_1;
+			mqttPayload[CMD] = BACKWARD;
+			
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "rollerConveyor2PlusId":
+			
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_2;
+			mqttPayload[CMD] = FORWARD;
+			
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "rollerConveyor2StopId":
+			
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_2;
+			mqttPayload[CMD] = STOP;
+			
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			
+		case "rollerConveyor2MinusId":
+			
+			mqttPayload[ACTUATOR] = ROLLER_CONVEYOR_2;
+			mqttPayload[CMD] = BACKWARD;
+			
+			
+			try {
+				mqttClient.publish("PalHmi", mqttPayload);
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
 			
 		case "manualId":
 			
-			mqttPayload[3] = 2;
+			mqttPayload[MODE] = 2;
 			
 			break;
 			
 		case "automaticId":
 			
-			mqttPayload[3] = 1;
+			mqttPayload[MODE] = 1;
 			//node.addEventHandler(ActionEvent.ACTION, event -> mqttPublish());
 			break;
 			
