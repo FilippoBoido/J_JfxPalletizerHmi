@@ -62,9 +62,9 @@ public class Main extends Application{
 				SYSTEM_MODE_TYPE = 3;
 	
 	//Payload byte section
-	final int 	MODE = 2,
-				ACTUATOR = 3,
-				CMD = 4;
+	final int 	MODE = 0,
+				ACTUATOR = 1,
+				CMD = 2;
 	
 	
 	public static void main(String[] args) {
@@ -293,7 +293,7 @@ public class Main extends Application{
 		}
 		
 		mqttClient = new MqttFx("tcp://localhost:1883", new MqttFxCallback(console), console ) ;
-		mqttClient.subscribe("PalletizerHmiMessages"); 
+		mqttClient.subscribe("PalPlc"); 
 		Scene scene = new Scene(root);
 		stage.setScene(scene);		
 		stage.show();
